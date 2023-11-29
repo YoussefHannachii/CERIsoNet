@@ -1,0 +1,20 @@
+<nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
+  <div class="d-flex flex-row mb-3 p-3">
+    <a class="navbar-brand" routerLink="/homePageClient">
+        <img src="../../../assets/780cd3675ae64712be7d4a05eda6034b.png" alt="Logo de la page" width="80" height="80">
+    </a>
+        <ul class="navbar-nav align-self-end mr-auto p-3">
+        <li class="nav-item">
+          <a class="nav-link text-light" routerLink="/">Accueil</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav align-self-end mr-auto p-3">
+        <li class="nav-item">
+          <a class="nav-link text-light" routerLink="/">Messagerie</a>
+        </li>
+      </ul>
+  </div>
+      <div class="ml-auto p-2">
+        <button class="btn btn-outline-light" (click)="deconnexion()">Déconnexion</button>
+      </div>
+  </nav>
