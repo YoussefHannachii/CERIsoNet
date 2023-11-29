@@ -1,3 +1,13 @@
 .custom-range::-webkit-slider-thumb {
   background-color: #959291; /* Couleur du curseur pour les navigateurs basés sur WebKit (Chrome, Safari, etc.) */
 }
+
+#element-card {
+  cursor: pointer; /* Le curseur indiquera que l'élément est cliquable */
+}
+
+#element-card:hover {
+  /* Style que vous souhaitez appliquer lorsque l'élément est survolé (optionnel) */
+  background-color: #f0f0f0;
+  color: #333;
+}
