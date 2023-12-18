@@ -1,7 +1,26 @@
-<div class="p-3 bg-secondary text-white">
-    <div class="d-flex justify-content-evenly">
-        Vous revoilà {{username}}, 
-        Derniére connexion : {{affichageDate}}
-        <button (click)="closeTheNotifBar()" type="button" class="btn-close" aria-label="Close"></button>
+<div *ngIf="{notifExists}">
+    <div *ngIf="notifType == 'newConnection'" class="p-3 bg-secondary text-white">
+        <div class="d-flex justify-content-evenly">
+           {{notifContent}}
+            <button (click)="closeTheNotifBar()" type="button" class="btn-close" aria-label="Close"></button>
+        </div>
+    </div>
+    <div *ngIf="notifType === 'newConnectionOther'|| notifType === 'commentAutreUtilisateur' || notifType === 'likeAutreUtilisateur' || notifType === 'partageAutreUtilisateur' || notifType ==='deconnexionOther'" class="p-3 mb-2 bg-info text-dark">
+        <div class="d-flex justify-content-evenly">
+           {{notifContent}}
+            <button (click)="closeTheNotifBar()" type="button" class="btn-close" aria-label="Close"></button>
+        </div>
+    </div>
+    <div *ngIf="notifType === 'likeUtilisateur' || notifType ==='commentUtilisateur'|| notifType ==='partageUtilisateur'" class="p-3 mb-2 bg-success text-white">
+        <div class="d-flex justify-content-evenly">
+           {{notifContent}}
+            <button (click)="closeTheNotifBar()" type="button" class="btn-close" aria-label="Close"></button>
+        </div>
+    </div>
+    <div *ngIf="notifType === 'dislikeUtilisateur'" class="p-3 mb-2 bg-danger text-white">
+        <div class="d-flex justify-content-evenly">
+           {{notifContent}}
+            <button (click)="closeTheNotifBar()" type="button" class="btn-close" aria-label="Close"></button>
+        </div>
     </div>
 </div>

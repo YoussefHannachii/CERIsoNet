@@ -1,10 +1,71 @@
-<div class="m-2 bg-secondary-subtle">
-  <div class="card col-mb-4 m-2 p-5">
-    <img src="../../../assets/780cd3675ae64712be7d4a05eda6034b.png" class="card-img-top" style="width: 90%" height="350"  alt="...">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
-    </div>
-  </div>
-</div>
+<app-notification-bar *ngIf="notificationExists" class="fixed-top"></app-notification-bar>
+<app-header></app-header>
+<div class="container col-12 mt-2">
+    <div id="element-card" class="card col-12 mb-3 text-center" style="max-width: 100%;" >
+        <div class="card-header d-flex justify-content-around">
+          <div>ID Message : {{selectedMessage._id}}</div>    
+          <div>Utilisateur : {{selectedUser.identifiant}}</div>
+        </div>
+        <div class="mt-2 col-md-12 d-flex flex-column align-items-center">
+            <img src="{{ selectedMessage.image.url }}" class="img-fluid rounded-start" alt="{{selectedMessage.image.title}}" style="width: 90%; height: 400px;">
+            <div class="d-flex justify-content-center mt-2">
+                <div *ngFor="let hashtag of selectedMessage.hashtags" class="badge bg-secondary text-wrap text-center" style="width: 6rem; margin-right: 5px;">
+                    {{ hashtag }}
+                </div>
+            </div>
+        </div>
+          <div class="col-md-12">
+            <!-- Retirez la classe col-md-8 pour permettre au texte de prendre toute la largeur -->
+            <div class="card-body">
+              <h5 class="card-title">{{ selectedMessage.body }}</h5>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Utilisateur</th>
+                    <th>Commentaire</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let comment of displayedComments; let last = last">
+                        <td>
+                            <div class="d-flex align-items-center">
+                            <img src="{{getAvatarUrl(comment.commentedBy)}}" alt="Avatar" class="rounded-circle" style="width: 30px; height: 30px; margin-right: 10px;">
+                            <span>{{findIdentifiantById(comment.commentedBy)}}</span>
+                            </div>
+                        </td>
+                        <td>{{ comment.text }}</td>
+                    </tr>
+              </tbody>
+              
+            </table>
+            <div class="text-center">
+                <button class="btn btn-outline-secondary" *ngIf="displayedComments.length < selectedMessage.comments.length" (click)="showMoreComments()">Voir plus de commentaires</button>
+              </div>
+            </div>
+              
+              
+              <!-- Message alternatif si items est vide -->
+              <div *ngIf="selectedMessage.comments.length === 0">
+                Aucun commentaire. 
+              </div>
+              <div class=" m-1 input-group">
+                <span class="input-group-text">Ajouter votre commentaire</span>
+                <input type="text" class="form-control" [(ngModel)]="commentContent"  (keyup.enter)="finishComment()">
+                <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="finishComment()">Commenter</button>
+              </div>
+            </div>
+        <div class="card-footer text-body-secondary d-flex justify-content-between">
+          <div>
+            <button (click)="likeMessage(selectedMessage._id)" (mouseover)="isHovered = true" (mouseout)="isHovered = false" type="button" class="btn m-2 btn-outline-secondary">{{ isHovered ? selectedMessage.likes : (isMessageLiked(selectedMessage._id) ? 'Dislike' : 'Like') }}</button>
+            <button type="button" class="btn btn-outline-secondary" (click)="openShareInput()">Partager</button>
+            <div *ngIf="isSharePopUp" class="input-group mb-3">
+              <input type="text" class="form-control" placeholder="Ajouter votre message a ce partage" aria-label="Recipient's username" aria-describedby="button-addon2" [(ngModel)]="shareContent"  (keyup.enter)="finishShare()">
+              <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="finishShare()">Valider</button>
+            </div>
+          </div>
+          </div>
+          <div class="ml-auto">      
+            <p>Partagé le : {{selectedMessage.date}} {{selectedMessage.hour}}</p>
+          </div>
+        </div>
+      

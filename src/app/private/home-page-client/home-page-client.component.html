@@ -1,18 +1,29 @@
-<app-notification-bar (closeNotifBarEvent)="recieveNotifCloseEvent($event)" *ngIf="notificationExists"></app-notification-bar>
+<app-notification-bar *ngIf="notificationExists" class="fixed-top"></app-notification-bar>
 <app-header></app-header>
 
 <div class="container mx-auto border border-dark shadow p-3 mt-2 mb-5 bg-body rounded">
     <!-- Another div at the top -->
     <div class="d-flex justify-content-between">
       <div class="child-div col-md-8">
-        <div class="input-group  mb-3 shadow">
-            <input type="text" class="form-control" placeholder="Rechercher un message. exp: id,#hashtag" aria-label="Username" aria-describedby="basic-addon1">
-            <span class="input-group-text" id="basic-addon1" (click)="log()">@</span>
+        <div class="input-group mb-3 shadow">
+            <input type="text" class="form-control" [placeholder]="placeHolderText" aria-label="Username" aria-describedby="basic-addon1" [(ngModel)]="userInput" (keyup)="onInputChange()" (keyup.enter)="onEnterPressed()">
+            <select *ngIf="showDropdown && this.methodeDeFiltre=='nomUtilisateur'"  [(ngModel)]="selectedOption" (ngModelChange)="chooseUser($event)">
+              <option *ngFor="let user of dropdownOptions" [value]="user.id">{{ user.nom }} {{user.prenom}}</option>
+            </select>
+            <div class="input-group-text">
+                <input type="radio" id="userRadio" name="searchOption" (change)="changeFiltreMethode('nomUtilisateur')" checked> Utilisateur
+            </div>
+            <div class="input-group-text">
+                <input type="radio" id="hashtagRadio" name="searchOption" (change)="changeFiltreMethode('hashtagMessage')"> Hashtag
+            </div>
+            <div class="input-group-text">
+              <button type="button" class="btn btn-outline-secondary" (click)="resetPage()">Reset</button>
+            </div>
         </div>
       </div>
       <div class="child-div col-md-3 mb-2">
-        <div class="form-floating">
-            <select class="form-select custom-select shadow" id="floatingSelect" aria-label="Floating label select example" (click)="log()" [(ngModel)]="methodeDeTri">
+       <div class="form-floating">
+            <select class="form-select custom-select shadow" id="floatingSelect" aria-label="Floating label select example"  [(ngModel)]="methodeDeTri" (ngModelChange)="onTriChange($event)">
               <option selected disabled>Trier Par</option>
               <option value="LikeDown">Les plus likés</option>
               <option value="LikeUp">Les moins likés</option>
@@ -25,11 +36,12 @@
       <!-- Add more child divs as needed -->
     </div>
     <!-- Cards Section -->
-    <div *ngFor="let message of listMessages | paginate : { itemsPerPage:messageParPage, currentPage:page}" id="element-card" class="card col-12 mb-3 text-center" style="max-width: 100%;" (click)="log()">
-      <div class="card-header text-centre">
-        {{message._id}}
+    <div *ngFor="let message of listMessages | paginate : { itemsPerPage:messageParPage, currentPage:page}" id="element-card" class="card col-12 mb-3 text-center" style="max-width: 100%;" >
+      <div class="card-header d-flex justify-content-around">
+        <div>ID Message : {{message._id}}</div>    
+        <div>Utilisateur : {{ findIdentifiantById(message.createdBy) }}</div>
       </div>
-      <div class="row g-0">
+      <div class="row g-0" (click)="navigateToMessageDetails(message._id,message)">
         <div class="col-md-4">
           <img src="{{ message.image.url }}" class="img-fluid rounded-start" alt="{{message.image.title}}">
           <div *ngFor="let hashtag of message.hashtags" class="badge bg-secondary text-wrap" style="width: 6rem;">
@@ -42,8 +54,8 @@
             <h5 class="card-title">{{ message.body }}</h5>
             <div *ngFor="let comment of message.comments | slice:0:3; let last = last">
               <p class="text-bold"></p>
-              <p>{{ comment.commentedBy}} : {{ comment.text }}</p>
-              <a *ngIf="last && message.comments.length > 3">({{message.comments.length-3}}) Autres commentaires ...</a>
+              <p>{{ findIdentifiantById(comment.commentedBy) }} : {{ comment.text }}</p>
+              <a class="primary-text" *ngIf="last && message.comments.length > 3">({{message.comments.length-3}}) Autres commentaires ...</a>
             </div>
             
             
@@ -56,11 +68,14 @@
       </div>
       <div class="card-footer text-body-secondary d-flex justify-content-between">
         <div>
-          <button type="button" class="btn btn-outline-secondary">Like</button>
-          <button type="button" class="btn btn-outline-secondary">Partager</button>
+          <button (click)="likeMessage(message._id)" (mouseover)="isHovered = true" (mouseout)="isHovered = false" type="button" class="btn m-2 btn-outline-secondary">{{ isHovered ? message.likes : (isMessageLiked(message._id) ? 'Dislike' : 'Like') }}</button>
+          <button type="button" class="btn btn-outline-secondary" (click)="openShareInput()">Partager</button>
+          <div *ngIf="isSharePopUp" class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Ajouter votre message a ce partage" aria-label="Recipient's username" aria-describedby="button-addon2" [(ngModel)]="shareContent"  (keyup.enter)="finishShare(message._id)">
+            <button class="btn btn-outline-secondary" type="button" id="button-addon2" (click)="finishShare(message._id)">Valider</button>
+          </div>
         </div>
         <div class="ml-auto">
-          
           <p>Partagé le : {{message.date}} {{message.hour}}</p>
         </div>
       </div>
@@ -69,12 +84,12 @@
     <div class="d-flex justify-content-between">
         <div class="child-div col-md-4  ">
           <div class="form-floating">
-            <select class="form-select custom-select shadow" id="floatingSelect" aria-label="Floating label select example" (onChange)="log()" [(ngModel)]="messageParPage">
+            <select class="form-select custom-select shadow" id="floatingSelect" aria-label="Floating label select example"  [(ngModel)]="messageParPage">
               <option value="10" selected disabled>{{messageParPage}}</option>
               <option value="20">20</option>
               <option value="30">30</option>
             </select>
-            <label for="floatingSelect">Nombre de messages affichés</label>
+            <label for="floatingSelect">Choissisez le nombre de messages affichés</label>
           </div>
         </div>
         <div class="child-div col-md-4 mb-2">

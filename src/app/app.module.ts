@@ -14,6 +14,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSliderModule } from '@angular/material/slider';
 import {NgxPaginationModule} from 'ngx-pagination';
 
+
 //LE MODULE DE MON APPLICATION , CA CONTIENT TOUT LES IMPORTS NECESSAIRES AINSI QUE LES COMPONENTS DE L'APP
 
 @NgModule({
@@ -23,7 +24,8 @@ import {NgxPaginationModule} from 'ngx-pagination';
     HomePageClientComponent,
     NotificationBarComponent,
     HeaderComponent,
-    MessageApplicationComponent
+    MessageApplicationComponent,
+    
   ],
   imports: [
     BrowserModule,
